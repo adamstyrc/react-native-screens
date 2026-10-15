@@ -45,7 +45,18 @@ async function openMenuOne() {
   await openContextMenu(menuOneBarButton);
 }
 
-describeIfIOS('Stack Header Menu (iOS)', () => {
+/**
+ * The dismiss tap also reaches the screen beneath the menu, so it lands on a
+ * plain heading: at its leading edge, clear of every menu this screen opens.
+ */
+async function dismissMenu() {
+  await dismissContextMenu({
+    over: by.text('setMenuItemOptions (Menu 1)'),
+    xFraction: 0.02,
+  });
+}
+
+describeIfIOS('@smoke Stack Header Menu (iOS)', () => {
   beforeAll(async () => {
     await device.reloadReactNative();
     await selectSingleFeatureTestsScreen(
@@ -69,7 +80,7 @@ describeIfIOS('Stack Header Menu (iOS)', () => {
       await expect(element(by.text('Toggle 1-3'))).toBeVisible();
       await expect(element(by.text('Submenu with Radio'))).toBeVisible();
 
-      await dismissContextMenu();
+      await dismissMenu();
     });
 
     it('should dismiss the menu and emit toast after tapping the action item "Action 1-1"', async () => {
@@ -158,7 +169,7 @@ describeIfIOS('Stack Header Menu (iOS)', () => {
 
   describe('title menu', () => {
     it('should open a menu with both title actions when the header title is tapped', async () => {
-      await dismissContextMenu();
+      await dismissMenu();
 
       await openHeaderTitleMenu(HEADER_TITLE);
 
@@ -184,7 +195,7 @@ describeIfIOS('Stack Header Menu (iOS)', () => {
 });
 
 describeIfIOS(
-  'Stack Header Menu (iOS): setMenuItemOptions view command',
+  '@smoke Stack Header Menu (iOS): setMenuItemOptions view command',
   () => {
     beforeAll(async () => {
       await device.reloadReactNative();
@@ -206,7 +217,7 @@ describeIfIOS(
 
     it('should add an icon to the renamed item while keeping its title', async () => {
       await expect(menuRowIcon('star.fill', 'New Title')).not.toExist();
-      await dismissContextMenu();
+      await dismissMenu();
 
       await setPicker('menu-item-options-title-picker', 'title', 'no change');
       await setPicker('menu-item-options-icon-picker', 'icon', 'star.fill');
@@ -219,7 +230,7 @@ describeIfIOS(
     });
 
     it('should check Toggle 1-1 and emit a selection toast when toggleState is set to true', async () => {
-      await dismissContextMenu();
+      await dismissMenu();
 
       await setPicker(
         'menu-item-options-target-id-picker',
@@ -241,7 +252,7 @@ describeIfIOS(
     });
 
     it('should keep Radio 1-1 selected when deselecting it in a singleSelection submenu', async () => {
-      await dismissContextMenu();
+      await dismissMenu();
 
       await setPicker(
         'menu-item-options-target-id-picker',
@@ -262,7 +273,7 @@ describeIfIOS(
     });
 
     it('should move the singleSelection checkmark from Radio 1-1 to Radio 1-2', async () => {
-      await dismissContextMenu();
+      await dismissMenu();
 
       await setPicker(
         'menu-item-options-target-id-picker',
@@ -290,38 +301,41 @@ describeIfIOS(
   },
 );
 
-describeIfIOS('Stack Header Menu (iOS): setMenuOptions view command', () => {
-  beforeAll(async () => {
-    await device.reloadReactNative();
-    await selectSingleFeatureTestsScreen(
-      'Stackv5',
-      'test-stack-header-menu-ios',
-    );
-  });
+describeIfIOS(
+  '@smoke Stack Header Menu (iOS): setMenuOptions view command',
+  () => {
+    beforeAll(async () => {
+      await device.reloadReactNative();
+      await selectSingleFeatureTestsScreen(
+        'Stackv5',
+        'test-stack-header-menu-ios',
+      );
+    });
 
-  it('should rename the targeted submenu', async () => {
-    await setPicker('menu-options-title-picker', 'title', 'New Title');
-    await tapSendButton('send-menu-options-button');
+    it('should rename the targeted submenu', async () => {
+      await setPicker('menu-options-title-picker', 'title', 'New Title');
+      await tapSendButton('send-menu-options-button');
 
-    await openMenuOne();
+      await openMenuOne();
 
-    await expect(element(by.text('New Title'))).toBeVisible();
-    await expect(element(by.text('Submenu with Radio'))).not.toExist();
-  });
+      await expect(element(by.text('New Title'))).toBeVisible();
+      await expect(element(by.text('Submenu with Radio'))).not.toExist();
+    });
 
-  it('should add an icon to the renamed submenu while keeping its title', async () => {
-    await expect(menuRowIcon('bell.fill', 'New Title')).not.toExist();
-    await dismissContextMenu();
+    it('should add an icon to the renamed submenu while keeping its title', async () => {
+      await expect(menuRowIcon('bell.fill', 'New Title')).not.toExist();
+      await dismissMenu();
 
-    await setPicker('menu-options-title-picker', 'title', 'no change');
-    await setPicker('menu-options-icon-picker', 'icon', 'bell.fill');
-    await tapSendButton('send-menu-options-button');
+      await setPicker('menu-options-title-picker', 'title', 'no change');
+      await setPicker('menu-options-icon-picker', 'icon', 'bell.fill');
+      await tapSendButton('send-menu-options-button');
 
-    await openMenuOne();
+      await openMenuOne();
 
-    await expect(element(by.text('New Title'))).toBeVisible();
-    await expect(menuRowIcon('bell.fill', 'New Title')).toBeVisible();
+      await expect(element(by.text('New Title'))).toBeVisible();
+      await expect(menuRowIcon('bell.fill', 'New Title')).toBeVisible();
 
-    await dismissContextMenu();
-  });
-});
+      await dismissMenu();
+    });
+  },
+);

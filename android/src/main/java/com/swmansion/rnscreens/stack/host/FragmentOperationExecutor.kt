@@ -2,7 +2,7 @@ package com.swmansion.rnscreens.stack.host
 
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.swmansion.rnscreens.helpers.createTransactionWithReordering
+import com.swmansion.rnscreens.core.utils.createTransactionWithReordering
 
 internal class FragmentOperationExecutor {
     internal fun executeOperations(
@@ -26,6 +26,7 @@ internal class FragmentOperationExecutor {
                 tx.addToBackStack(op.fragment.stackScreen.screenKey)
             }
             tx.add(op.containerViewId, op.fragment)
+            op.coveredFragment?.let { tx.detach(it) }
             tx.setPrimaryNavigationFragment(op.fragment)
             commitTransaction(tx, op.allowStateLoss)
         }
